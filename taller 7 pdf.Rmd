@@ -1,0 +1,306 @@
+---
+title: "Práctica Taller 7 "
+author: "Alejandra Cortes Ordoñez y Julio Cesar Cruz Hernandez"
+date: "2022-10-06"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r librerias, echo=FALSE, include=FALSE}
+library(readxl)
+library(AER)
+library(mvtnorm)
+library(stargazer)
+library(tidyverse)
+library(dplyr)
+```
+
+
+```{r datos, echo=FALSE}
+datos<-read_xls("/Users/alecortes/Desktop/Taller Econometría/CollegeDistance (2).xls")
+attach(datos)
+```
+
+# Pregunta 1
+Realice una regresi´on de la variable a˜nos de educaci´on completados (ED)
+sobre la variable de la distancia a la universidad m´as cercana (Dist).
+¿Cu´al es la pendiente estimada? Interprete este coeficiente y su significancia.
+```{r pregunta 1}
+
+(reg1<-lm(ed~dist))
+```
+La pendiente estimada es -0.7337. Lo cual se interpreta como: caeteris paribus ante una "tens of miles" adicional la educación disminuye en -0.7337 años. 
+
+
+# Pregunta 2
+
+Ahora estime una regresi´on de la variable ED sobre la variable Dist, pero
+incluyendo algunos regresores adicionales de control sobre las caracter
+´ısticas del estudiante, la familia del estudiante, y el mercado laboral
+local. Espec´ıficamente, incluya como regresores adicionales las variables
+Bytest, Female, Black, Hispanic, Incomehi, Ownhome, DadColl, Cue80 y
+Stwmfg80. ¿Cu´al es el efecto estimado de la variable Dist sobre la variable
+ED?
+
+```{r pregunta 2}
+
+(reg2<-lm(ed~dist+bytest+female+black+hispanic+incomehi+ownhome+dadcoll+cue80+stwmfg80))
+```
+
+El efecto estimado de la variable Dist sobre la variable ED es de -0.03154.
+Interpretación: caeteris paribus ante una "tens of miles" adicional la educación disminuye en -0.03154 años. 
+
+
+# Pregunta 3
+
+¿Es sustancialmente distinto el efecto estimado de la variable Dist sobre
+la variable ED en la regresi´on de (2) de la regresi´on en (1)? En base a
+esto, ¿parece que la regresi´on (1) presente un sesgo de variable omitida
+importante?
+
+```{r pregunta 3, echo=FALSE, warning=FALSE}
+stargazer(reg1,reg2,type="text")
+```
+
+La regresión 1 si presenta un sesgo por variable omitida, pues en la tabla anterior observamos 
+que el resto de las variables son significativas y a mayor $R^2$ ajustada, mejor es la ecuación de regresión y esto ocurre al usar el modelo 2. 
+
+# Pregunta 4
+
+Compare el ajuste de la regresi´on de (1) y de (2) utilizando los errores
+est´andar de regresi´on, R2 y ¯R2. ¿Por qu´e R2 y ¯R2 son tan similares en
+la regresi´on (2)?
+
+```{r pregunta 4, echo=FALSE, warning=FALSE}
+
+stargazer(reg2,type="text")
+
+```
+
+Utilizando la tabla de la pregunta anterior, podemos observar que  $R^2$ ajustada del modelo 2 es mayor, esto significa que las variables independientes elegidas para determinar la variable dependiente (años completados de educación) pueden explicar mejor la variación que en el caso del modelo 1. 
+
+Podemos observar en la tabla anterior que en el modelo 2 $R^2$ es igual a 0.279 y  $R^2$ ajustada es igual a 0.277, son similares pues el número de términos no está afectando sustancialmente el valor de $R^2$ ajustada.
+
+# Pregunta 5
+
+El valor del coeficiente de la variable DadColl es positivo. ¿Qu´e mide este
+coeficiente? Interprete su resultado a partir de un intervalo al 95% de
+confianza.
+
+```{r pregunta 5, echo=FALSE}
+coef(reg2)
+```
+
+Interpretación: cateris paribus dado que el papá de la persona se haya graduado aumenta en 0.69613237 los años de educacion completada. 
+
+```{r pregunta 51, echo=FALSE}
+confint(reg2,level = 0.95)
+```
+
+El intervalo de confianza de si el padre se graduó o no de College es (0.56139107  0.830873662). Por lo que el coeficiente de 0.69613237 cae dentro del intervalo, lo que signnifica que en el intervalo de 95% 
+(0.56139107  0.830873662) si se encuentra nuestro valor dentro del intervalo, por lo que no rechazamos la hipótesis nula con un 5% de significancia. 
+
+# Pregunta 6
+
+Explique por qu´e las variables Cue80 y Swmfg80 aparecen en la regresi´on.
+¿Cu´ales cree que son los signos de sus coeficientes estimados (+ o -)?
+Interprete la magnitud de estos coeficientes a partir de su intervalo al
+95% de confianza.
+
+```{r pregunta 6, echo=FALSE, warning=FALSE}
+stargazer(reg2,type="text")
+
+
+```
+
+
+Podemos observar en la tabla anterior que ambas son significativas. La tasa de desempleo en el país en 1980 es importante agregara a la regresión, pues es un indicador de desarrollo del país, podemos ver que el coeficiente es igual a 0.023. Es positivo, lo cual interpretamos como que si aumenta la tasa de desempleo entonces los años de educación completada también aumentan, pues el individuo se verá atraido por estudiar más ante la falta de oportunidad laboral. 
+El salario por hora en manufactura en el estado también es significativo. El coeficiente -0.052 es negativo, por lo que ante un aumento del salario por hora en manufactura del estado el individuo tiene más incentivos para trabajar en manufactura que completar un año más de educación  
+
+# Pregunta 7
+
+Bob es un hombre negro. Su escuela secundaria estaba a 20 millas de
+la universidad m´as cercana. Su calificaci´on en la prueba (Bytest) fue de
+58. Su ingreso familiar en 1980 fue de $26,000 y su familia pose´ıa una
+casa. Su madre acudi´o a la universidad, pero su padre no. La tasa de
+desempleo en su condado era del 7.5 %, y el promedio del salario por
+hora manufacturero en su estado era de $9.75. Estime el n´umero de a˜nos
+completados de estudio por Bob utilizando la regresi´on de (2).
+*A la regresión 2 no agregamos mom college
+
+el número de años completados de estudio por Bob:
+```{r pregunta 7, echo=FALSE}
+modelo<-lm(ed~dist+bytest+female+black+hispanic+incomehi+ownhome+dadcoll+cue80+stwmfg80)
+valores<- data.frame(dist=2,bytest=58,female=0,black=1,hispanic=0,incomehi=1,ownhome=1,dadcoll=0,cue80=7.5,stwmfg80=9.75)
+predict(modelo,valores)
+```
+
+Así el número de años completados de estudio por Bob de acuerdo a los datos sería 14.79051  años. 
+
+# Pregunta 8
+
+Jim tiene las mismas caracter´ısticas que Bob, salvo que su escuela secundaria
+estaba a 40 millas de la universidad m´as cercana. Estime los a˜nos
+completados de estudio por Jim utilizando la regresi´on de (2).
+*No se agregó momcoll a la regresión
+
+```{r pregunta 8, echo=FALSE}
+modelojim<-lm(ed~dist+bytest+female+black+hispanic+incomehi+ownhome+dadcoll+cue80+stwmfg80)
+valoresjim<- data.frame(dist=4,bytest=58,female=0,black=1,hispanic=0,incomehi=1,ownhome=1,dadcoll=0,cue80=7.5,stwmfg80=9.75)
+predict(modelojim,valoresjim)
+
+```
+
+
+Así el número de años completados de estudio por Jim de acuerdo a los datos sería 14.72744 años.
+
+
+# Pregunta 9
+
+Se ha argumentado que, controlando por otros factores, los negros y los
+hispanos completan m´as cursos universitarios que los blancos. ¿Es esto
+congruente con los resultados estimados por la regresi´on (2)?
+
+```{r pregunta 9, echo=FALSE, warning=FALSE}
+reg2<-lm(ed~dist+bytest+female+black+hispanic+incomehi+ownhome+dadcoll+cue80+stwmfg80)
+stargazer(reg2,type="text")
+```
+
+Los coeficientes de black (0.36) e hispanic (0.399) son positivos y significativos, por lo  que es congruente argumentar que al agregar otros factores, los negros y los hispanos completan más cursos universitarios que los blancos de acuerdo a la regresión 2. 
+
+
+# Pregunta 10
+
+Realice una regresi´on de la variable ED sobre las variables Dist, Female,
+Bytest, Tuition, Black, Hispanic, Incomehi, Ownhome, DadColl, Mom-
+Coll, Cue80 y Stwmfg80. Si la variable Dist aumenta de 2 a 3 (es decir,
+de 20 a 30 millas), ¿cu´anto se espera que cambien los a˜nos de educaci´on?
+Si la variable Dist aumenta desde 6 hasta 7 (es decir, desde 60 hasta 70
+millas), ¿cu´anto se espera que cambien los a˜nos de educaci´on?
+
+```{r pregunta 10, echo=FALSE,warning=FALSE}
+reg3<-lm(ed~dist+female+bytest+tuition+black+hispanic+incomehi+ownhome+dadcoll+momcoll+cue80+stwmfg80)
+stargazer(reg3,type="text")
+```
+
+Caeteris Paribus ante un aumento de 20 a 30 millas (10 millas) se espera que los años de educación completados disminuyan en 0.037. (La variable es significativa). Del mismo modo, caeteris Paribus ante un aumento de 6 a 7 millas (1 milla) se espera que los años de educación completados disminuyan en 0.037.
+En ambos es el mismo resultado, pues es el mismo cambio. 
+
+# Pregunta 11
+
+Realice una regresi´on del ln(ED) sobre las variables Dist, Female, Bytest,
+Tuition, Black, Hispanic, Incomehi, Ownhome, DadColl, MomColl,
+Cue80 y Stwmfg80. Si la variable Dist aumenta de 2 a 3 (de 20 a 30 millas),
+¿cu´anto se espera que cambien los a˜nos de educaci´on? Si la variable
+Dist aumenta de 6 a 7 (es decir, de 60 a 70 millas), ¿cu´anto se espera que
+cambien los a˜nos de educaci´on?
+
+```{r pregunta 11, echo=FALSE, warning=FALSE}
+reg4<-lm(log(ed)~dist+female+bytest+tuition+black+hispanic+incomehi+ownhome+dadcoll+momcoll+cue80+stwmfg80)
+stargazer(reg4,type="text")
+```
+
+Caeteris Paribus ante un aumento de 2 a 3  (10 millas) se espera que los años de educación completados disminuyan en 0.3%. (La variable es significativa). Del mismo modo, caeteris paribus ante un aumento de 6 a 7 millas (10 millas) se espera que los años de educación completados disminuyan en 0.3%.
+En ambos es el mismo resultado, pues es el mismo cambio. 
+
+# Pregunta 12
+
+Realice una regresión de la variable ED sobre las variables Dist, Dist2,
+Female, Bytest, Tuition, Black, Hispanic, Incomehi, Ownhome, DadColl,
+MomColl, Cue80 y Stwmfg80. Si la variable Dist aumenta de 20 a 30 (de
+20 a 30 millas), ¿cu´anto se espera que cambien los a˜nos de educaci´on?
+Si Dist aumenta de 6 a 7 (es decir, de 60 a 70 millas), ¿cu´anto se espera
+que cambien los a˜nos de educaci´on?
+
+```{r pregunta 12, echo=FALSE}
+datos<-datos%>%
+  mutate(dist2=dist^2)
+```
+
+```{r pregunta 12resp, echo=FALSE, warning=FALSE}
+reg5<-lm(ed~dist+dist2+female+bytest+tuition+black+hispanic+incomehi+ownhome+dadcoll+momcoll+cue80+stwmfg80,data=datos)
+stargazer(reg5,type="text")
+```
+Caeteris Paribus ante un aumento de 20 a 30 millas (10 millas) se espera que los años de educación completados disminuyan en 0.081. (La variable es significativa).
+caeteris paribus ante un aumento de 60 a 70 millas (10 millas) se espera que los años de educación completados disminuyan en 0.081. El coeficiente es significativo. 
+
+# Pregunta 13
+
+A˜nada el t´ermino de interacci´on DadColl × MomColl a la regresi´on de
+(12). ¿Qu´e mide el coeficiente del t´ermino de interacci´on?
+
+```{r pregunta 13, echo=FALSE, warning=FALSE}
+datos<-datos%>%
+  mutate(DadMom=dadcoll*momcoll)
+
+```
+
+
+```{r pregunta 13resp, echo=FALSE, warning=FALSE}
+reg6<-lm(ed~dist+dist2+female+bytest+tuition+black+hispanic+incomehi+ownhome+dadcoll+momcoll+cue80+stwmfg80+DadMom,data=datos)
+stargazer(reg6,type="text")
+
+```
+
+El coeficiente del término de interacción es una variable dummy que mide si el padre y madre se graduaron ambos del colegio (DadMom=1), en otros casos (DadMom=0). 
+Caeteris Paribus si el padre y madre se graduaron del colegio disminuye en 0.366 los años de educación completada. 
+
+
+# Pregunta 14
+
+14) Mary, Jane, Alexis y Bonnie tienen los mismos valores para las variables
+Dist, Bytest, Tuition, Female, Black, Hispanic, Fincome, Ownhome,
+Cue80 y Stwmfg80. Ninguno de los padres de Mary fue a la universidad.
+El padre de Jane asisti´o a la universidad, pero su madre no lo hizo. La
+madre de Alexis asisti´o a la universidad, pero su padre no lo hizo. Tanto
+el padre como la madre de Bonnie fueron a la universidad. Utilizando las
+regresiones de (12).
+
+¿Qu´e predice la regresi´on acerca de la diferencia entre los a˜nos de
+educaci´on de Jane y Mary?
+```{r pregunta 14 a, echo=FALSE}
+reg6<-lm(ed~dist+female+bytest+tuition+black+hispanic+ownhome+dadcoll+momcoll+cue80+stwmfg80,data=datos)
+valores1<- data.frame(dist=4,bytest=58,tuition=0.84988,female=1,black=1,hispanic=0,ownhome=1,dadcoll=c(1,0),momcoll=c(0,0),cue80=7.5,stwmfg80=9.75)
+predict(reg6,valores1)
+```
+Predice que Jane tendrá más años de educación completada que Mary, pues Jane completará 15.18 años y Mary 14.49 años 
+
+¿Qu´e predice la regresi´on acerca de la diferencia entre los a˜nos de
+educaci´on de Alexis y Mary?
+
+```{r pregunta 14 b, echo=FALSE}
+reg7<-lm(ed~dist+female+bytest+tuition+black+hispanic+ownhome+dadcoll+momcoll+cue80+stwmfg80,data=datos)
+valores2<- data.frame(dist=4,bytest=58,tuition=0.84988,female=1,black=1,hispanic=0,ownhome=1,dadcoll=c(0,0),momcoll=c(1,0),cue80=7.5,stwmfg80=9.75)
+predict(reg7,valores2)
+```
+
+
+Predice que Alexis tendrá más años de educación completada que Mary, pues Alexis completará 14.92 años y Mary 14.49 años 
+
+¿Qu´e predice la regresi´on acerca de la diferencia entre los a˜nos de
+educaci´on de Bonnie y Mary?
+
+```{r pregunta 14 c, echo=FALSE}
+reg8<-lm(ed~dist+female+bytest+tuition+black+hispanic+ownhome+dadcoll+momcoll+cue80+stwmfg80,data=datos)
+valores3<- data.frame(dist=4,bytest=58,tuition=0.84988,female=1,black=1,hispanic=0,ownhome=1,dadcoll=c(1,0),momcoll=c(1,0),cue80=7.5,stwmfg80=9.75)
+predict(reg8,valores3)
+```
+
+
+Predice que Bonnie tendrá más años de educación completada que Mary, pues Bonnie completará 15.61 años y Mary 14.49 años 
+
+
+# Pregunta 15
+
+Despu´es de realizar todas estas regresiones (y cualquier otra que desee
+agregar), resuma el efecto de la variable Dist sobre los a˜nos de educaci´on.
+
+La variable distancia (medida en decenas de millas) afecta a los años años de educación de manera negativa y es una variable significativa en todas las regresiones que se realizaron. 
+Nosotros consideramos que a mayor distancia del hogar de la persona a la escuela (mayor tiempo de traslado) tiene un efecto negativo en el rendimiento escolar y por ende en los años de educación concluidos. Del mismo modo, a mayor edad la persona podría preferir trabajar o realizar otras actividades más cercanas a su hogar que considere le aporten mayor utilidad que tener que invertir su tiempo en trasladarse a la escuela. 
+
